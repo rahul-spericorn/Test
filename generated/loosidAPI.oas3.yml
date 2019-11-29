@@ -1,0 +1,471 @@
+openapi: 3.0.1
+info:
+  title: LoosidApp API
+  description: LOOSID connects you to your local sober community – meet people from
+    your local area, match with likeminded individuals and start dating other sober
+    people.
+  version: "3"
+servers:
+- url: https://virtserver.swaggerhub.com/loosid/loosidapi/3
+- url: http://api.loosid.cc/v3
+- url: http://localhost/v3
+tags:
+- name: Guides
+  description: Loosid Lifestyle Guides
+- name: Listings
+  description: Access to all listings
+
+paths:
+  /guides: 
+    get:
+      tags:
+        - Guides
+      description: Collection of available guides .
+      operationId: getGuides
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Guides'
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: No guides found
+    post:
+      tags:
+        - Guides
+      description: Populate our Guides database (Temporary function until we have Admin portal)
+      operationId: addGuides
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Guide'      
+      responses:
+        '200':
+          description: OK
+        '500':
+          description: POST Error
+  
+  /guides/guide/:
+    post:
+      tags:
+        - Guides
+      description: Add a single Guide to database (Temporary function until we have Admin portal)
+      operationId: addGuide
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/Guide'  
+      responses:
+        '200':
+          description: OK
+        '500':
+          description: POST Error
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'  
+
+  /listings:
+    get:
+      tags:
+        - Listings 
+      description: Collection of available listings .
+      operationId: getListings
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Listings'
+              # example:
+              #   listingsExample:
+              #     $ref: '#/components/examples/listingsExample'
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: No listings found
+
+    post:
+      tags:
+        - Listings
+      description: Populate our Listing database (Temporary function until we have Admin portal)
+      operationId: addListings
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Listing'      
+      responses:
+        '200':
+          description: OK
+        '500':
+          description: POST Error
+    
+
+  /listings/search:
+    get:
+      tags:
+        - Listings
+      description: Collection of available search .
+      operationId: searchListings
+      parameters:
+      - name: guideName
+        in: query
+        description: Filter search results by guide name.
+        schema:
+          type: string
+      - name: keywords
+        in: query
+        description: Words used to search the listings DB
+        schema:
+          type: string
+      - name: offset
+        in: query
+        description: Offset number of search results by integer when paging is required
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Limit the number of results
+        schema:
+          type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Listing'
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: No search found
+
+  /listings/listing/:
+    post:
+      tags:
+        - Listings
+      description: Add a single Listing to database (Temporary function until we have Admin portal)
+      operationId: addListing
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/Listing'  
+      responses:
+        '200':
+          description: OK
+        '500':
+          description: POST Error
+
+  /listings/listing/{listingID}:
+    get:
+      tags:
+        - Listings
+      description: Get a single `listing` from `listings`.
+      operationId: getListing
+      parameters:
+      - name: listingID
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Listing'
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: listing not found
+components:
+  schemas:
+    Guide:
+      required:
+      - guideDescription
+      - guideID
+      - guideName
+      type: object
+      properties:
+        guideID:
+          type: string
+          description: Unique ID of a Guide
+        guideName:
+          type: string
+          description: Unique name of a Guide
+        guideDescription:
+          type: string
+          description: Quick description of a Guide
+    Guides:
+      type: array
+      items:
+        $ref: '#/components/schemas/Guide'
+    Location:
+      type: object
+      required:
+      - city
+      - state
+      - zip
+      properties:
+        address1:
+          type: string
+          description: First row of the address for location.
+        address2:
+          type: string
+          description: Optional second row of address for location.  Can be used for
+            suite number or other info
+        city:
+          type: string
+          description: City name
+        state:
+          type: string
+          description: 2-letter State abbreviation 
+        zip:
+          type: string
+          description: Zipcode or Postal Code
+        country:
+          type: string
+          description: The [ISO 3166-1 Alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)
+            country code for listing
+        longitude:
+          type: string
+          description: Longitude coordinates of the location
+        latitude:
+          type: string
+          description: Latitude coordinates of the location
+      description: Returns an array containing the details of the location such as
+        address, longitude, etc.
+    Listing:
+      required:
+      - guideName
+      - listingID
+      - location
+      - listingName
+      type: object
+      properties:
+        listingID:
+          type: string
+          description: Unique identifier for listing
+        listingName:
+          type: string
+          description: Name or Title of the listing
+        listingDescription:
+          type: string
+          description: Describes the listing.
+        guideName:
+          type: string
+          description: Unique string name of the Guide the listing belongs to
+        listingTags:
+          type: string
+          description: Tags are used to as keywords
+        listingCategory:
+          type: string
+          description: Category name this listing belongs to
+        startsAt:
+          type: string
+          description: Time the listing event will start
+        endsAt:
+          type: string
+          description: Time the listing event will end
+        cost:
+          type: string
+          description: Cost of the venue
+        venueName:
+          type: string
+          description: Name of the venue if different from listingName
+        email:
+          type: string
+          description: Email address to for listing
+        phone:
+          type: string
+          description: Phone of the venue
+        location:
+          $ref: '#/components/schemas/Location'
+        locationLabel:
+          type: string
+        externalUrl1:
+          type: string
+          description: The URL for the listing at a 3rd-party website, like EventBrite.com
+        externalImageUrl:
+          type: string
+          description: The image URL for the listing at a 3rd-party website, like
+            EventBrite.com
+        premiumLevel:
+          type: string
+          description: The type of premium features the listing has signed up for.
+        brands:
+          type: string
+          description: A list of brands sold or available at the listing location
+    Listings:
+      type: array
+      items:
+        $ref: '#/components/schemas/Listing'
+    Error:
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string    
+
+
+  examples:
+    listingExample:
+      value:
+        id: 1
+        name: new object
+      summary: A sample object
+    listingsExample:
+      value:  
+        listings:
+        - listingID: '1'
+          listingTitle: ACME Burgers
+          listingDescription: Elit nisl ullamcorper neque conubia convallis orci
+          guideName: restaurants
+          listingTags: casual, american
+          startsAt: ''
+          endsAt: ''
+          cost: ''
+          venue: ''
+          location:
+            address1: 123 Elm St
+            address2: ''
+            city: New York
+            state: NY
+            zip: '12345'
+            country: US
+            latitude: '40.712776'
+            longitude: "-74.005974"
+            locationLabel: String
+          externalUrl: http://example.com
+          externalImageUrl: http://example.com/img/abcdefg.jpg
+          premiumLevel: gold
+          brands: Seedlip,Heineken
+        - listingID: '2'
+          listingTitle: String
+          listingDescription: Elit nisl ullamcorper neque conubia convallis orci
+          guideName: restaurants
+          listingTags: casual, american
+          startsAt: ''
+          endsAt: ''
+          cost: ''
+          venue: ''
+          location:
+            address1: 123 Elm St
+            address2: ''
+            city: New York
+            state: NY
+            zip: '12345'
+            country: US
+            latitude: '40.712776'
+            longitude: "-74.005974"
+            locationLabel: String
+          externalUrl: http://example.com
+          externalImageUrl: http://example.com/img/abcdefg.jpg
+          premiumLevel: gold
+          brands: Seedlip,Heineken
+        - listingID: '3'
+          listingTitle: String
+          listingDescription: Elit nisl ullamcorper neque conubia convallis orci
+          guideName: restaurants
+          listingTags: casual, american
+          startsAt: ''
+          endsAt: ''
+          cost: ''
+          venue: ''
+          location:
+            address1: 123 Elm St
+            address2: ''
+            city: New York
+            state: NY
+            zip: '12345'
+            country: US
+            latitude: '40.712776'
+            longitude: "-74.005974"
+            locationLabel: String
+          externalUrl: http://example.com
+          externalImageUrl: http://example.com/img/abcdefg.jpg
+          premiumLevel: gold
+          brands: Seedlip,Heineken
+        - listingID: '4'
+          listingTitle: String
+          listingDescription: Elit nisl ullamcorper neque conubia convallis orci
+          guideName: restaurants
+          listingTags: casual, american
+          startsAt: ''
+          endsAt: ''
+          cost: ''
+          venue: ''
+          location:
+            address1: 123 Elm St
+            address2: ''
+            city: New York
+            state: NY
+            zip: '12345'
+            country: US
+            latitude: '40.712776'
+            longitude: "-74.005974"
+            locationLabel: String
+          externalUrl: http://example.com
+          externalImageUrl: http://example.com/img/abcdefg.jpg
+          premiumLevel: gold
+          brands: Seedlip,Heineken
+        - listingID: '5'
+          listingTitle: String
+          listingDescription: Elit nisl ullamcorper neque conubia convallis orci
+          guideName: restaurants
+          listingTags: casual, american
+          startsAt: ''
+          endsAt: ''
+          cost: ''
+          venue: ''
+          location:
+            address1: 123 Elm St
+            address2: ''
+            city: New York
+            state: NY
+            zip: '12345'
+            country: US
+            latitude: '40.712776'
+            longitude: "-74.005974"
+            locationLabel: String
+          externalUrl: http://example.com
+          externalImageUrl: http://example.com/img/abcdefg.jpg
+          premiumLevel: gold
+          brands: Seedlip,Heineken

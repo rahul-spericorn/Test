@@ -1,0 +1,17 @@
+[
+  {
+    "guideID": "1",
+    "guideName": "events",
+    "guideDescription": "Attend events with people living a Sober lifestyle."
+  },
+  {
+    "guideID": "2",
+    "guideName": "travel",
+    "guideDescription": "Take a trip with a Sober lifestyle focus."
+  },
+  {
+    "guideID": "3",
+    "guideName": "restaurant",
+    "guideDescription": "Find restaurants that serve alcohol-free beverages."
+  }
+]
